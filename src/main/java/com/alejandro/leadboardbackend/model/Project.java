@@ -1,0 +1,44 @@
+package com.alejandro.leadboardbackend.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Data
+public class Project {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    private String mainImageUrl; // Imagen de portada
+
+    @ElementCollection
+    @CollectionTable(name = "project_images", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "image_url")
+    private List<String> galleryUrls; // Lista de fotos (planos, renders, fotos finales)
+
+    // Campos adaptables
+    private String category; // Ej: "Residencial", "Comercial", "Remodelación
+    private String location; // Ciudad o país
+    private String projectYear;
+    private String clientName; // Opcional, para dar prestigio
+
+    @ElementCollection
+    private List<String> tags; // Ej: "Minimalista", "Ecológico", "Urbano"
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+}

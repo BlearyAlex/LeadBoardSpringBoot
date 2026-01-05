@@ -1,0 +1,39 @@
+package com.alejandro.leadboardbackend.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "Leads")
+@Data()
+public class Lead {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String fullName;
+    private String email;
+    private String phone; // Importante para contacto rápido
+    private String subject;
+
+    @Column(columnDefinition = "TEXT")
+    private String message;
+
+    private LocalDateTime receivedAt;
+
+    @Enumerated(EnumType.STRING)
+    private LeadStatus status = LeadStatus.NEW; // NEW, CONTACTED, ARCHIVED
+
+    @PrePersist
+    protected void onReceived() {
+        receivedAt = LocalDateTime.now();
+    }
+
+    // Enum para los estados del prospecto
+    enum LeadStatus {
+        NEW, CONTACTED, ARCHIVED
+    }
+}

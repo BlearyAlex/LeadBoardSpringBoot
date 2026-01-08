@@ -1,6 +1,7 @@
 package com.alejandro.leadboardbackend.exception;
 
-public class FileUploadException extends RuntimeException {
+public class FileUploadException extends BusinessException {
+
     public FileUploadException(String message) {
         super(message);
     }

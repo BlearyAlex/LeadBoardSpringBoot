@@ -1,7 +1,9 @@
 package com.alejandro.leadboardbackend.service;
 
+import com.alejandro.leadboardbackend.exception.InvalidFileException;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,13 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CloudinaryService {
+public class CloudinaryService implements ICloudinaryService {
 
     private final Cloudinary cloudinary;
 
     // Tipos de archivos permitidos
     private static final List<String> ALLOWED_TYPES = Arrays.asList(
-            "image/jpeg", "image/png", "image/gif", "image/webp"
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "image/webp"
     );
 
     // Tamaño máximo: 10MB
@@ -46,17 +51,18 @@ public class CloudinaryService {
      * @throws IOException              si hay error en la subida
      * @throws IllegalArgumentException si el archivo no es válido
      */
+    @Override
     public Map<String, Object> upload(MultipartFile multipartFile) throws IOException {
 
         validateFile(multipartFile);
-
         File file = null;
         try {
             file = convertToFile(multipartFile);
-
-            Map<String, Object> result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
-
-            return result;
+            return cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+        } catch (InvalidFileException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FileUploadException("Error al subir archivo a Cloudinary");
         } finally {
             if (file != null && file.exists()) {
                 file.delete();
@@ -65,30 +71,49 @@ public class CloudinaryService {
     }
 
     /**
-     * Valida que el archivo cumpla con los requisitos
+     * Elimina una imagen de Cloudinary usando su public_id
+     *
+     * @param publicId el ID público de la imagen en Cloudinary
+     * @return Map con el resultado de la operación
+     * @throws IOException si hay error en la eliminación
      */
+    @Override
+    public Map<String, Object> delete(String publicId) throws IOException {
+        try {
+            return cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            throw new FileUploadException("Error al eliminar archivo de Cloudinary", e);
+        }
+    }
+
+    // -------------------------
+    // Validaciones
+    // -------------------------
+
     private void validateFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("El archivo esta vacio");
+        if (file == null || file.isEmpty()) {
+            throw new InvalidFileException("El archivo está vacío");
         }
 
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException(
-                    "El archivo es demasiado grande. Tamaño máximo: " + (MAX_FILE_SIZE / 1024 / 1024) + "MB"
+            throw new InvalidFileException(
+                    "El archivo excede el tamaño máximo permitido de "
+                            + (MAX_FILE_SIZE / 1024 / 1024) + "MB"
             );
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
-            throw new IllegalArgumentException(
+            throw new InvalidFileException(
                     "Tipo de archivo no permitido. Tipos aceptados: " + ALLOWED_TYPES
             );
         }
     }
 
-    /**
-     * Convierte MultipartFile a File temporal de forma segura
-     */
+    // -------------------------
+    // Utilidad
+    // -------------------------
+
     private File convertToFile(MultipartFile multipartFile) throws IOException {
         // Crear archivo temporal con prefijo y sufijo
         String originalFileName = multipartFile.getOriginalFilename();
@@ -107,16 +132,5 @@ public class CloudinaryService {
         }
 
         return file;
-    }
-
-    /**
-     * Elimina una imagen de Cloudinary usando su public_id
-     *
-     * @param publicId el ID público de la imagen en Cloudinary
-     * @return Map con el resultado de la operación
-     * @throws IOException si hay error en la eliminación
-     */
-    public Map<String, Object> delete(String publicId) throws IOException {
-        return cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
     }
 }

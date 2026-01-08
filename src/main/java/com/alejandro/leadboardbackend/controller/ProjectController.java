@@ -1,7 +1,10 @@
 package com.alejandro.leadboardbackend.controller;
 
+import com.alejandro.leadboardbackend.dto.ProjectRequestDto;
+import com.alejandro.leadboardbackend.dto.ProjectResponseDto;
 import com.alejandro.leadboardbackend.model.Project;
 import com.alejandro.leadboardbackend.service.ProjectService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,31 +24,16 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    @GetMapping
-    public ResponseEntity<List<Project>> list() {
-        List<Project> projects = projectService.getAllProjects();
-        return ResponseEntity.ok(projects);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Project> getById(@PathVariable Long id) {
-        Project project = projectService.getProjectById(id);
-        return ResponseEntity.ok(project);
-    }
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Project> create(
-            @RequestPart("project") Project project,
-            @RequestPart("file") MultipartFile mainImage,
+    public ResponseEntity<ProjectResponseDto> create(
+            @Valid @RequestPart("project") ProjectRequestDto requestDto,
+            @RequestPart(value = "mainImage", required = false) MultipartFile mainImage,
             @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery) {
 
-        Project savedProject = projectService.saveProject(project, mainImage, gallery);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProject);
-    }
+        ProjectResponseDto savedProject = projectService.saveProject(requestDto, mainImage, gallery);
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        projectService.deleteProject(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        URI location = URI.create("/api/projects" + savedProject.getId());
+
+        return ResponseEntity.created(location).body(savedProject);
     }
 }

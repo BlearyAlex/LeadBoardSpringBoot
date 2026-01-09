@@ -10,6 +10,7 @@ public class ProjectResponseDto {
     private String title;
     private String description;
     private String mainImageUrl;
+    private String mainImagePublicId;
     private List<String> galleryUrls;
     private String category;
     private String location;

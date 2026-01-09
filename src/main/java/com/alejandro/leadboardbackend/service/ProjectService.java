@@ -7,6 +7,7 @@ import com.alejandro.leadboardbackend.exception.InvalidFileException;
 import com.alejandro.leadboardbackend.exception.ResourceNotFoundException;
 import com.alejandro.leadboardbackend.mapper.ProjectMapper;
 import com.alejandro.leadboardbackend.model.Project;
+import com.alejandro.leadboardbackend.model.ProjectImage;
 import com.alejandro.leadboardbackend.repository.ProjectRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -16,12 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class ProjectService implements  IProjectService {
+public class ProjectService implements IProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
@@ -46,23 +46,74 @@ public class ProjectService implements  IProjectService {
 
         // Subir imagen principal
         if (mainImage != null && !mainImage.isEmpty()) {
-            logger.debug("Subiendo imagen principal");
-            project.setMainImageUrl(uploadFile(mainImage, "imagen principal"));
+            try {
+                Map<String, Object> result = cloudinaryService.upload(mainImage);
+                String url = (String) result.get("url");
+                String publicId = (String) result.get("public_id");
+                project.setMainImageUrl(url);
+                project.setMainImagePublicId(publicId);
+            } catch (IOException e) {
+                throw new FileUploadException("Error al subir la imagen principal");
+            }
         }
 
         // Subir galería
         if (gallery != null && !gallery.isEmpty()) {
-            logger.debug("Subiendo {} imágenes de galería", gallery.size());
-            List<String> galleryUrls = gallery.stream()
-                    .map(file -> uploadFile(file, "galería"))
-                    .toList(); // Java 16+, si no, usa collect(Collectors.toList())
-            project.setGalleryUrls(galleryUrls);
+            for (MultipartFile file : gallery) {
+                try {
+                    Map<String, Object> result = cloudinaryService.upload(file);
+                    ProjectImage image = new ProjectImage();
+                    image.setUrl((String) result.get("url"));
+                    image.setPublicId((String) result.get("public_id"));
+                    image.setProject(project);
+                    project.getGallery().add(image);
+                } catch (IOException e) {
+                    throw new FileUploadException("Error al subir imagen de galería", e);
+                }
+            }
         }
 
         Project savedProject = projectRepository.save(project);
+
         logger.info("Proyecto creado exitosamente con id: {}", savedProject.getId());
 
         return projectMapper.toResponseDto(savedProject);
+    }
+
+    @Override
+    @Transactional
+    public ProjectResponseDto editProject(Long projectId, ProjectRequestDto requestDto, MultipartFile mainImage) {
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Proyecto no encontrado con id: " + projectId));
+
+        project.setTitle(requestDto.getTitle());
+        project.setDescription(requestDto.getDescription());
+        project.setCategory(requestDto.getCategory());
+        project.setLocation(requestDto.getLocation());
+        project.setProjectYear(requestDto.getProjectYear());
+        project.setClientName(requestDto.getClientName());
+        project.setTags(requestDto.getTags());
+
+        if (mainImage != null && !mainImage.isEmpty()) {
+            try {
+                if (project.getMainImagePublicId() != null) {
+                    cloudinaryService.delete(project.getMainImagePublicId());
+                }
+
+                // Subir nueva
+                Map<String, Object> result = cloudinaryService.upload(mainImage);
+                project.setMainImageUrl((String) result.get("url"));
+                project.setMainImagePublicId((String) result.get("public_id"));
+
+            } catch (IOException e) {
+                throw new FileUploadException("Error al subir imagen principal", e);
+            }
+        }
+
+        Project updatedProject = projectRepository.save(project);
+
+        return projectMapper.toResponseDto(updatedProject);
     }
 
     // -------------------------

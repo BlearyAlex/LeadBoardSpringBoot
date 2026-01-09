@@ -53,7 +53,6 @@ public class CloudinaryService implements ICloudinaryService {
      */
     @Override
     public Map<String, Object> upload(MultipartFile multipartFile) throws IOException {
-
         validateFile(multipartFile);
         File file = null;
         try {

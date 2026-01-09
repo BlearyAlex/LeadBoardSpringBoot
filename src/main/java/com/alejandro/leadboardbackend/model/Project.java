@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,11 +22,10 @@ public class Project {
     private String description;
 
     private String mainImageUrl; // Imagen de portada
+    private String mainImagePublicId;
 
-    @ElementCollection
-    @CollectionTable(name = "project_images", joinColumns = @JoinColumn(name = "project_id"))
-    @Column(name = "image_url")
-    private List<String> galleryUrls; // Lista de fotos (planos, renders, fotos finales)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectImage> gallery = new ArrayList<>(); // Lista de fotos (planos, renders, fotos finales)
 
     // Campos adaptables
     private String category; // Ej: "Residencial", "Comercial", "Remodelación

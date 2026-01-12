@@ -15,13 +15,12 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ProjectController {
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProjectResponseDto> create(
@@ -31,19 +30,25 @@ public class ProjectController {
 
         ProjectResponseDto savedProject = projectService.saveProject(requestDto, mainImage, gallery);
 
-        URI location = URI.create("/api/projects" + savedProject.getId());
+        URI location = URI.create("/api/projects/" + savedProject.getId());
 
         return ResponseEntity.created(location).body(savedProject);
     }
 
-    @PutMapping("/id")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProjectResponseDto> editProject(
-            @PathVariable("id") Long projectId,
-            @Valid @PathVariable("project") ProjectRequestDto requestDto,
-            @PathVariable(value = "mainImage", required = false) MultipartFile mainImage) {
+            @PathVariable Long id,
+            @Valid @RequestPart("project") ProjectRequestDto requestDto,
+            @RequestPart(value = "mainImage", required = false) MultipartFile mainImage) {
 
-        ProjectResponseDto updatedProject = projectService.editProject(projectId, requestDto, mainImage);
+        ProjectResponseDto updatedProject = projectService.editProject(id, requestDto, mainImage);
         return ResponseEntity.ok(updatedProject);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
+        projectService.deleteProject(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

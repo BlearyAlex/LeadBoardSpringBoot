@@ -11,9 +11,10 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ProjectImageMapper.class})
 public interface ProjectMapper {
 
+    @Mapping(target = "galleryUrls", source = "gallery")
     ProjectResponseDto toResponseDto(Project project);
 
     Project toEntity(ProjectRequestDto projectRequestDto);

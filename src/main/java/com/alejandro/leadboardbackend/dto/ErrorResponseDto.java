@@ -2,6 +2,7 @@ package com.alejandro.leadboardbackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class ErrorResponseDto {
     private String message;
     private String path;
     private List<String> details;
+    private String errorCode;
 
     public ErrorResponseDto() {
         this.timestamp = LocalDateTime.now();

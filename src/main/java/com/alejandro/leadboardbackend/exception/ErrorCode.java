@@ -14,6 +14,7 @@ public enum ErrorCode {
     // ---------- PROYECTOS ----------
     PROJECT_NOT_FOUND("PROJECT_404", HttpStatus.NOT_FOUND, "Proyecto no encontrado"),
     PROJECT_BUSINESS_ERROR("PROJECT_400", HttpStatus.BAD_REQUEST, "Error de negocio en proyecto"),
+    USER_EXIST("USER_409", HttpStatus.CONFLICT, "El usuario ya existe"),
 
     // ---------- ARCHIVOS ----------
     FILE_TOO_LARGE("FILE_001", HttpStatus.PAYLOAD_TOO_LARGE, "Archivo demasiado grande"),

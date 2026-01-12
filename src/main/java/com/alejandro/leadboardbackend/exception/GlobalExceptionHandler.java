@@ -106,4 +106,10 @@ public class GlobalExceptionHandler {
         ErrorResponseDto error = buildError(ErrorCode.INVALID_FILE, ex.getMessage(), request);
         return ResponseEntity.badRequest().body(error);
     }
+
+    @ExceptionHandler(UserExistsException.class)
+    public ResponseEntity<ErrorResponseDto> handleUserExist(UserExistsException ex, WebRequest request) {
+        ErrorResponseDto error = buildError(ErrorCode.USER_EXIST, ex.getMessage(), request);
+        return ResponseEntity.status(ErrorCode.USER_EXIST.getStatus()).body(error);
+    }
 }

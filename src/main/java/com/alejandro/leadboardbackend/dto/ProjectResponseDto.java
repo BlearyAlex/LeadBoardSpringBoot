@@ -11,10 +11,11 @@ public class ProjectResponseDto {
     private String description;
     private String mainImageUrl;
     private String mainImagePublicId;
-    private List<String> galleryUrls;
+    private List<ProjectImageResponseDto> galleryUrls;
     private String category;
     private String location;
     private String projectYear;
     private String clientName;
     private List<String> tags;
 }
+

@@ -116,6 +116,47 @@ public class ProjectService implements IProjectService {
         return projectMapper.toResponseDto(updatedProject);
     }
 
+    @Override
+    public void deleteProject(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() ->  new ResourceNotFoundException("Proyecto no encontrado con id: " + projectId));
+
+        if (project.getMainImagePublicId() != null) {
+            try {
+                cloudinaryService.delete(project.getMainImagePublicId());
+            } catch (IOException e) {
+                throw new FileUploadException("Eror al eliminar la imagen con publicId: " + project.getMainImagePublicId());
+            }
+        }
+
+       if (project.getGallery() != null) {
+           project.getGallery().forEach(image -> {
+               try {
+                   cloudinaryService.delete(image.getPublicId());
+               } catch (IOException e) {
+                   throw new FileUploadException("Error al eliminar la imagen con publicId: " + image.getPublicId());
+               }
+           });
+       }
+        projectRepository.delete(project);
+    }
+
+    @Override
+    public List<ProjectResponseDto> getAllProjects() {
+        return projectMapper.toDtoList(
+                projectRepository.findAllWithImages()
+        );
+    }
+
+    @Override
+    public ProjectResponseDto getProjectById(Long projectId) {
+        Project project = projectRepository.findByIdWithGallery(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Proyecto no encontrado"));
+
+        return projectMapper.toResponseDto(project);
+    }
+
+
     // -------------------------
     // Helper
     // -------------------------

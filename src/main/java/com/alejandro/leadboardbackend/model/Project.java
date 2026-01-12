@@ -1,14 +1,18 @@
 package com.alejandro.leadboardbackend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Project {
 
     @Id
@@ -24,7 +28,7 @@ public class Project {
     private String mainImageUrl; // Imagen de portada
     private String mainImagePublicId;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProjectImage> gallery = new ArrayList<>(); // Lista de fotos (planos, renders, fotos finales)
 
     // Campos adaptables

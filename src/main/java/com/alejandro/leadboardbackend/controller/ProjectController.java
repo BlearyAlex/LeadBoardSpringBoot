@@ -1,11 +1,10 @@
 package com.alejandro.leadboardbackend.controller;
 
-import com.alejandro.leadboardbackend.dto.ProjectRequestDto;
-import com.alejandro.leadboardbackend.dto.ProjectResponseDto;
+import com.alejandro.leadboardbackend.dto.request.ProjectRequestDto;
+import com.alejandro.leadboardbackend.dto.response.ProjectResponseDto;
 import com.alejandro.leadboardbackend.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

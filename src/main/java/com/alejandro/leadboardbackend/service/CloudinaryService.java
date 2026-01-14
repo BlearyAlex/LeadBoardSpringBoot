@@ -1,6 +1,6 @@
 package com.alejandro.leadboardbackend.service;
 
-import com.alejandro.leadboardbackend.exception.InvalidFileException;
+import com.alejandro.leadboardbackend.exception.fileException.InvalidFileException;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;

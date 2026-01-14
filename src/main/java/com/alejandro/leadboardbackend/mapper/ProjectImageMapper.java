@@ -1,7 +1,6 @@
 package com.alejandro.leadboardbackend.mapper;
 
-import com.alejandro.leadboardbackend.dto.ProjectImageResponseDto;
-import com.alejandro.leadboardbackend.dto.ProjectResponseDto;
+import com.alejandro.leadboardbackend.dto.response.ProjectImageResponseDto;
 import com.alejandro.leadboardbackend.model.ProjectImage;
 import org.mapstruct.Mapper;
 

@@ -1,10 +1,10 @@
 package com.alejandro.leadboardbackend.service;
 
-import com.alejandro.leadboardbackend.dto.ProjectRequestDto;
-import com.alejandro.leadboardbackend.dto.ProjectResponseDto;
-import com.alejandro.leadboardbackend.exception.FileUploadException;
-import com.alejandro.leadboardbackend.exception.InvalidFileException;
-import com.alejandro.leadboardbackend.exception.ResourceNotFoundException;
+import com.alejandro.leadboardbackend.dto.request.ProjectRequestDto;
+import com.alejandro.leadboardbackend.dto.response.ProjectResponseDto;
+import com.alejandro.leadboardbackend.exception.fileException.FileUploadException;
+import com.alejandro.leadboardbackend.exception.fileException.InvalidFileException;
+import com.alejandro.leadboardbackend.exception.business.ResourceNotFoundException;
 import com.alejandro.leadboardbackend.mapper.ProjectMapper;
 import com.alejandro.leadboardbackend.model.Project;
 import com.alejandro.leadboardbackend.model.ProjectImage;

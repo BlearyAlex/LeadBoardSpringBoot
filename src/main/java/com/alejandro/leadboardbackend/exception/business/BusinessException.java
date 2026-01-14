@@ -1,4 +1,4 @@
-package com.alejandro.leadboardbackend.exception;
+package com.alejandro.leadboardbackend.exception.business;
 
 public abstract class BusinessException extends RuntimeException {
 

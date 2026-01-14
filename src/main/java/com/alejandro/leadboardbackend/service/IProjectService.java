@@ -1,7 +1,7 @@
 package com.alejandro.leadboardbackend.service;
 
-import com.alejandro.leadboardbackend.dto.ProjectRequestDto;
-import com.alejandro.leadboardbackend.dto.ProjectResponseDto;
+import com.alejandro.leadboardbackend.dto.request.ProjectRequestDto;
+import com.alejandro.leadboardbackend.dto.response.ProjectResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

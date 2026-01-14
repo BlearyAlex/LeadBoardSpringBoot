@@ -1,8 +1,12 @@
 package com.alejandro.leadboardbackend.service;
 
+import com.alejandro.leadboardbackend.dto.request.LoginRequestDto;
+import com.alejandro.leadboardbackend.dto.request.RegisterRequestDto;
+import com.alejandro.leadboardbackend.dto.response.LoginResponseDto;
 import com.alejandro.leadboardbackend.model.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface IUserService {
-    User registerUser(String username, String password);
-    boolean authenticate(String username, String password);
+    LoginResponseDto login(LoginRequestDto request);
+    User register(RegisterRequestDto request);
 }

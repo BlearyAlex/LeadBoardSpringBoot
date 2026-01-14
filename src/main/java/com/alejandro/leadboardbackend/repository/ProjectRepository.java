@@ -1,6 +1,5 @@
 package com.alejandro.leadboardbackend.repository;
 
-import com.alejandro.leadboardbackend.dto.ProjectResponseDto;
 import com.alejandro.leadboardbackend.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

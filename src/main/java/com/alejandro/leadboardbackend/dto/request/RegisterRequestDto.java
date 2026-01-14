@@ -1,9 +1,10 @@
-package com.alejandro.leadboardbackend.dto;
+package com.alejandro.leadboardbackend.dto.request;
 
 import lombok.Data;
 
 @Data
-public class UserDto {
+public class RegisterRequestDto {
+    private String email;
     private String username;
     private String password;
     private String displayName;

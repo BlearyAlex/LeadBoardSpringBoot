@@ -1,7 +1,7 @@
 package com.alejandro.leadboardbackend.service;
 
-import com.alejandro.leadboardbackend.exception.FileUploadException;
-import com.alejandro.leadboardbackend.exception.ResourceNotFoundException;
+import com.alejandro.leadboardbackend.exception.fileException.FileUploadException;
+import com.alejandro.leadboardbackend.exception.business.ResourceNotFoundException;
 import com.alejandro.leadboardbackend.model.ProjectImage;
 import com.alejandro.leadboardbackend.repository.ProjectImageRepository;
 import jakarta.transaction.Transactional;

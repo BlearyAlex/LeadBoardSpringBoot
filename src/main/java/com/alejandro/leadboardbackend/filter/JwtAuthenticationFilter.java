@@ -1,6 +1,6 @@
 package com.alejandro.leadboardbackend.filter;
 
-import com.alejandro.leadboardbackend.service.JwtService;
+import com.alejandro.leadboardbackend.service.impl.JwtServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor // Usar Lombok para limpiar el constructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtServiceImpl;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -45,14 +45,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         try {
-            userEmail = jwtService.extractUsername(jwt);
+            userEmail = jwtServiceImpl.extractUsername(jwt);
 
             // 3. Validar si el usuario ya está autenticado en el contexto
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
                 // 4. Validar integridad del token
-                if (jwtService.isTokenValid(jwt, userDetails)) {
+                if (jwtServiceImpl.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,

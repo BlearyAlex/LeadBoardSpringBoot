@@ -1,4 +1,4 @@
-package com.alejandro.leadboardbackend.dto.response;
+package com.alejandro.leadboardbackend.domain.dto.response;
 
 import lombok.Data;
 

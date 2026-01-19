@@ -1,6 +1,6 @@
 package com.alejandro.leadboardbackend.repository;
 
-import com.alejandro.leadboardbackend.model.User;
+import com.alejandro.leadboardbackend.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

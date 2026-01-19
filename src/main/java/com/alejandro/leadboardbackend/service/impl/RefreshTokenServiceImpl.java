@@ -1,10 +1,10 @@
-package com.alejandro.leadboardbackend.service;
+package com.alejandro.leadboardbackend.service.impl;
 
-import com.alejandro.leadboardbackend.dto.request.RefreshRequestDto;
-import com.alejandro.leadboardbackend.dto.response.LoginResponseDto;
+import com.alejandro.leadboardbackend.domain.dto.request.RefreshRequestDto;
+import com.alejandro.leadboardbackend.domain.dto.response.LoginResponseDto;
 import com.alejandro.leadboardbackend.exception.business.TokenRefreshException;
-import com.alejandro.leadboardbackend.model.RefreshToken;
-import com.alejandro.leadboardbackend.model.User;
+import com.alejandro.leadboardbackend.domain.entity.RefreshToken;
+import com.alejandro.leadboardbackend.domain.entity.User;
 import com.alejandro.leadboardbackend.repository.RefreshTokenRepository;
 import com.alejandro.leadboardbackend.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,16 +14,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenService {
+public class RefreshTokenServiceImpl {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtServiceImpl;
 
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
@@ -68,7 +67,7 @@ public class RefreshTokenService {
         refreshTokenRepository.deleteByUser(user);
 
         // 5. Generamos los nuevos tokens
-        String newAccessToken = jwtService.generateToken(user);
+        String newAccessToken = jwtServiceImpl.generateToken(user);
         RefreshToken newRefreshToken = createRefreshToken(user.getEmail());
 
         return new LoginResponseDto(

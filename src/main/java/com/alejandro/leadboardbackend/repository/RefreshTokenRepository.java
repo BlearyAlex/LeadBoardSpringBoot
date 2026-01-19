@@ -1,7 +1,7 @@
 package com.alejandro.leadboardbackend.repository;
 
-import com.alejandro.leadboardbackend.model.RefreshToken;
-import com.alejandro.leadboardbackend.model.User;
+import com.alejandro.leadboardbackend.domain.entity.RefreshToken;
+import com.alejandro.leadboardbackend.domain.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

@@ -1,8 +1,8 @@
 package com.alejandro.leadboardbackend.controller;
 
-import com.alejandro.leadboardbackend.dto.request.ProjectRequestDto;
-import com.alejandro.leadboardbackend.dto.response.ProjectResponseDto;
-import com.alejandro.leadboardbackend.service.ProjectService;
+import com.alejandro.leadboardbackend.domain.dto.request.ProjectRequestDto;
+import com.alejandro.leadboardbackend.domain.dto.response.ProjectResponseDto;
+import com.alejandro.leadboardbackend.service.impl.ProjectServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -19,7 +19,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ProjectController {
 
-    private final ProjectService projectService;
+    private final ProjectServiceImpl projectServiceImpl;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProjectResponseDto> create(
@@ -27,7 +27,7 @@ public class ProjectController {
             @RequestPart(value = "mainImage", required = false) MultipartFile mainImage,
             @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery) {
 
-        ProjectResponseDto savedProject = projectService.saveProject(requestDto, mainImage, gallery);
+        ProjectResponseDto savedProject = projectServiceImpl.saveProject(requestDto, mainImage, gallery);
 
         URI location = URI.create("/api/projects/" + savedProject.getId());
 
@@ -40,25 +40,25 @@ public class ProjectController {
             @Valid @RequestPart("project") ProjectRequestDto requestDto,
             @RequestPart(value = "mainImage", required = false) MultipartFile mainImage) {
 
-        ProjectResponseDto updatedProject = projectService.editProject(id, requestDto, mainImage);
+        ProjectResponseDto updatedProject = projectServiceImpl.editProject(id, requestDto, mainImage);
         return ResponseEntity.ok(updatedProject);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
-        projectService.deleteProject(id);
+        projectServiceImpl.deleteProject(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<ProjectResponseDto>> getAll() {
-        List<ProjectResponseDto> projects = projectService.getAllProjects();
+        List<ProjectResponseDto> projects = projectServiceImpl.getAllProjects();
         return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Long id) {
-        ProjectResponseDto project = projectService.getProjectById(id);
+        ProjectResponseDto project = projectServiceImpl.getProjectById(id);
         return ResponseEntity.ok(project);
     }
 }

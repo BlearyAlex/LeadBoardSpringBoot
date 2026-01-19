@@ -1,4 +1,4 @@
-package com.alejandro.leadboardbackend.model;
+package com.alejandro.leadboardbackend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

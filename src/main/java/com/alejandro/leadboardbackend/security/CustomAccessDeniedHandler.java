@@ -1,6 +1,6 @@
 package com.alejandro.leadboardbackend.security;
 
-import com.alejandro.leadboardbackend.dto.response.ErrorResponseDto;
+import com.alejandro.leadboardbackend.domain.dto.response.ErrorResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.alejandro.leadboardbackend.model;
+package com.alejandro.leadboardbackend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -39,6 +39,13 @@ public class Project {
 
     @ElementCollection
     private List<String> tags; // Ej: "Minimalista", "Ecológico", "Urbano"
+
+    @Enumerated(EnumType.STRING)
+    private ProjectStatus status;
+
+    public enum ProjectStatus {
+        COMPLETED, UNDER_CONSTRUCTION, CONCEPTUAL
+    }
 
     private LocalDateTime createdAt;
 

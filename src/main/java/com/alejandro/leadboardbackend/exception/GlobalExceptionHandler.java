@@ -1,6 +1,6 @@
 package com.alejandro.leadboardbackend.exception;
 
-import com.alejandro.leadboardbackend.dto.response.ErrorResponseDto;
+import com.alejandro.leadboardbackend.domain.dto.response.ErrorResponseDto;
 import com.alejandro.leadboardbackend.exception.business.*;
 import com.alejandro.leadboardbackend.exception.fileException.FileStorageException;
 import com.alejandro.leadboardbackend.exception.fileException.FileUploadException;
@@ -8,7 +8,6 @@ import com.alejandro.leadboardbackend.exception.fileException.InvalidFileExcepti
 import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -1,4 +1,4 @@
-package com.alejandro.leadboardbackend.model;
+package com.alejandro.leadboardbackend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public class Lead {
     }
 
     // Enum para los estados del prospecto
-    enum LeadStatus {
+    public enum LeadStatus {
         NEW, CONTACTED, ARCHIVED
     }
 }

@@ -3,19 +3,26 @@ package com.alejandro.leadboardbackend.service.impl;
 import com.alejandro.leadboardbackend.domain.dto.request.LoginRequestDto;
 import com.alejandro.leadboardbackend.domain.dto.request.RegisterRequestDto;
 import com.alejandro.leadboardbackend.domain.dto.response.LoginResponseDto;
+import com.alejandro.leadboardbackend.domain.entity.PasswordResetToken;
+import com.alejandro.leadboardbackend.exception.business.InvalidOperationException;
 import com.alejandro.leadboardbackend.exception.business.ResourceNotFoundException;
 import com.alejandro.leadboardbackend.exception.business.UserAlreadyExistsException;
 import com.alejandro.leadboardbackend.domain.entity.User;
+import com.alejandro.leadboardbackend.repository.PasswordResetTokenRepository;
 import com.alejandro.leadboardbackend.repository.UserRepository;
+import com.alejandro.leadboardbackend.service.EmailService;
 import com.alejandro.leadboardbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -23,8 +30,21 @@ public class UserServiceImpl implements UserService {
     private final JwtServiceImpl jwtServiceImpl;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
     private final AuthenticationManager authenticationManager;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final EmailService emailService;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtServiceImpl jwtServiceImpl, RefreshTokenServiceImpl refreshTokenServiceImpl, AuthenticationManager authenticationManager, PasswordResetTokenRepository tokenRepository, EmailService emailService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtServiceImpl = jwtServiceImpl;
+        this.refreshTokenServiceImpl = refreshTokenServiceImpl;
+        this.authenticationManager = authenticationManager;
+        this.tokenRepository = tokenRepository;
+        this.emailService = emailService;
+    }
 
     @Override
+    @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
         // 1. Autenticar
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -42,6 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User register(RegisterRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException(request.getEmail());
@@ -54,5 +75,44 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void requestPasswordReset(String email) {
+        // 1. Verificar si el usuario existe
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        // 2. Generar y guardar token (borrar previos si existen)
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken myToken = new PasswordResetToken(token, user);
+        tokenRepository.save(myToken);
+
+        // 3. Enviar email
+        String link = "http://localhost:5173/reset-password?token=" + token;
+        emailService.sendResetPasswordEmail(user.getEmail(), link);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        // 1. Validar token
+        PasswordResetToken passToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new InvalidOperationException("Token inválido"));
+
+        // 2. Verificar expiración
+        if (passToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            tokenRepository.delete(passToken);
+            throw new InvalidOperationException("El token ha expirado");
+        }
+
+        // 3. Actualizar contraseña del usuario
+        User user = passToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // 4. Limpiar token usado
+        tokenRepository.delete(passToken);
     }
 }

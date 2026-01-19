@@ -7,7 +7,7 @@ import com.alejandro.leadboardbackend.domain.entity.RefreshToken;
 import com.alejandro.leadboardbackend.domain.entity.User;
 import com.alejandro.leadboardbackend.repository.RefreshTokenRepository;
 import com.alejandro.leadboardbackend.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RefreshTokenServiceImpl {
 
     private final RefreshTokenRepository refreshTokenRepository;
@@ -27,6 +28,7 @@ public class RefreshTokenServiceImpl {
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
 
+    @Transactional
     public RefreshToken createRefreshToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado."));
@@ -42,6 +44,7 @@ public class RefreshTokenServiceImpl {
         return refreshTokenRepository.save(refreshToken);
     }
 
+    @Transactional
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);

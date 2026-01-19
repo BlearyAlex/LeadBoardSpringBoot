@@ -33,10 +33,10 @@ public class SecurityConfig {
                         // Endpoints públicos
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/projects/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/projects/public/**").permitAll()
 
                         // Endpoints protegidos
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/projectsImage")
+@RequestMapping("/api/v1/admin/projectsImage")
 @CrossOrigin(origins = "*")
 public class ProjectImageController {
     @Autowired

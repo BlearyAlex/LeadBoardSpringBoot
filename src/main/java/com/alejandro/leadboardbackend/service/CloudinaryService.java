@@ -1,13 +1,13 @@
 package com.alejandro.leadboardbackend.service;
 
+import com.alejandro.leadboardbackend.domain.dto.response.CloudinaryResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Map;
 
 public interface CloudinaryService {
 
-    Map<String, Object> upload(MultipartFile multipartFile) throws IOException;
+    CloudinaryResponseDto upload(MultipartFile multipartFile);
 
-    Map<String, Object> delete(String publicId) throws IOException;
+    void delete(String publicId);
 }

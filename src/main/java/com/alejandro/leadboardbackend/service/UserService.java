@@ -8,4 +8,6 @@ import com.alejandro.leadboardbackend.domain.entity.User;
 public interface UserService {
     LoginResponseDto login(LoginRequestDto request);
     User register(RegisterRequestDto request);
+    void requestPasswordReset(String email);
+    void resetPassword(String token, String newPassword);
 }

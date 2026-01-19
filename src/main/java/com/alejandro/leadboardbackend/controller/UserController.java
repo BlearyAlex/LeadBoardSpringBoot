@@ -1,14 +1,11 @@
 package com.alejandro.leadboardbackend.controller;
 
-import com.alejandro.leadboardbackend.domain.dto.request.LoginRequestDto;
-import com.alejandro.leadboardbackend.domain.dto.request.RefreshRequestDto;
-import com.alejandro.leadboardbackend.domain.dto.request.RegisterRequestDto;
+import com.alejandro.leadboardbackend.domain.dto.request.*;
 import com.alejandro.leadboardbackend.domain.dto.response.LoginResponseDto;
 import com.alejandro.leadboardbackend.domain.dto.response.RegisterResponse;
 import com.alejandro.leadboardbackend.domain.entity.User;
 import com.alejandro.leadboardbackend.service.impl.RefreshTokenServiceImpl;
 import com.alejandro.leadboardbackend.service.impl.UserServiceImpl;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,18 +13,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class UserController {
 
     private final UserServiceImpl userServiceImpl;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
 
-   @PostMapping("/register")
-   public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequestDto request) {
-       User newUser = userServiceImpl.register(request);
-       return ResponseEntity.ok(new RegisterResponse("Usuario creado correctamente", newUser.getEmail()));
-   }
+    public UserController(UserServiceImpl userServiceImpl, RefreshTokenServiceImpl refreshTokenServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
+        this.refreshTokenServiceImpl = refreshTokenServiceImpl;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequestDto request) {
+        User newUser = userServiceImpl.register(request);
+        return ResponseEntity.ok(new RegisterResponse("Usuario creado correctamente", newUser.getEmail()));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
@@ -39,5 +40,17 @@ public class UserController {
     public ResponseEntity<LoginResponseDto> refresh(@RequestBody RefreshRequestDto request) {
         // El servicio se encarga de validar, rotar y devolver el DTO
         return ResponseEntity.ok(refreshTokenServiceImpl.refreshToken(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequestDto request) {
+        userServiceImpl.requestPasswordReset(request.getEmail());
+        return ResponseEntity.ok("Se ha enviado un correo de recuperación");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        userServiceImpl.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Contraseña actualizada con éxito");
     }
 }

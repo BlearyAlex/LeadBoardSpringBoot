@@ -8,20 +8,28 @@ import com.alejandro.leadboardbackend.exception.business.ResourceNotFoundExcepti
 import com.alejandro.leadboardbackend.mapper.LeadMapper;
 import com.alejandro.leadboardbackend.repository.LeadRepository;
 import com.alejandro.leadboardbackend.service.LeadService;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
+@Service
+@Transactional(readOnly = true)
 public class LeadServiceImpl implements LeadService {
 
     private final LeadRepository leadRepository;
     private final LeadMapper leadMapper;
 
+    public LeadServiceImpl(LeadRepository leadRepository, LeadMapper leadMapper) {
+        this.leadRepository = leadRepository;
+        this.leadMapper = leadMapper;
+    }
+
     @Override
-    public List<LeadResponseDto> getAllLeads() {
-        return leadMapper.toDtoList(leadRepository.findAll());
+    @Transactional(readOnly = true)
+    public List<LeadResponseDto> getLeadsByStatus(Lead.LeadStatus status) {
+        return leadMapper.toDtoList(
+                leadRepository.findByStatus(status));
     }
 
     @Override
@@ -50,6 +58,7 @@ public class LeadServiceImpl implements LeadService {
                 .orElseThrow(() -> new ResourceNotFoundException("Lead no encontrado con id:" + leadId));
 
         lead.setStatus(Lead.LeadStatus.ARCHIVED);
+        leadRepository.save(lead);
     }
 
     @Override

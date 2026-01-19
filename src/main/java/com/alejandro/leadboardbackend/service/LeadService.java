@@ -3,11 +3,12 @@ package com.alejandro.leadboardbackend.service;
 import com.alejandro.leadboardbackend.domain.dto.request.CreateLeadRequestDto;
 import com.alejandro.leadboardbackend.domain.dto.request.UpdateLeadStatusRequestDto;
 import com.alejandro.leadboardbackend.domain.dto.response.LeadResponseDto;
+import com.alejandro.leadboardbackend.domain.entity.Lead;
 
 import java.util.List;
 
 public interface LeadService {
-    List<LeadResponseDto> getAllLeads();
+    List<LeadResponseDto> getLeadsByStatus(Lead.LeadStatus status);
 
     LeadResponseDto createLead(CreateLeadRequestDto request);
 

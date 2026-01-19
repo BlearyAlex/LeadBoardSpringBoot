@@ -1,14 +1,15 @@
 package com.alejandro.leadboardbackend.domain.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectImageResponseDto {
-    private Long id;
+public class CloudinaryResponseDto {
     private String url;
-    protected String publicId;
+    private String publicId;
 }

@@ -14,12 +14,15 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/projects")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/admin/projects")
 @CrossOrigin(origins = "*")
 public class ProjectController {
 
     private final ProjectServiceImpl projectServiceImpl;
+
+    public ProjectController(ProjectServiceImpl projectServiceImpl) {
+        this.projectServiceImpl = projectServiceImpl;
+    }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProjectResponseDto> create(

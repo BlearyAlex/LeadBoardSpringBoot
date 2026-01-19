@@ -1,11 +1,11 @@
 package com.alejandro.leadboardbackend.service.impl;
 
+import com.alejandro.leadboardbackend.domain.dto.response.CloudinaryResponseDto;
+import com.alejandro.leadboardbackend.exception.fileException.FileUploadException;
 import com.alejandro.leadboardbackend.exception.fileException.InvalidFileException;
 import com.alejandro.leadboardbackend.service.CloudinaryService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +28,8 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             "image/jpeg",
             "image/png",
             "image/gif",
-            "image/webp"
+            "image/webp",
+            "application/pdf"
     );
 
     // Tamaño máximo: 10MB
@@ -49,21 +50,24 @@ public class CloudinaryServiceImpl implements CloudinaryService {
      * Sube un archivo a Cloudinary
      *
      * @param multipartFile archivo a subir
-     * @return Map con la respuesta de Cloudinary (url, public_id, etc.)
-     * @throws IOException              si hay error en la subida
-     * @throws IllegalArgumentException si el archivo no es válido
+     * @return CloudinaryResponseDto con la respuesta de Cloudinary (url, public_id)
      */
     @Override
-    public Map<String, Object> upload(MultipartFile multipartFile) throws IOException {
+    public CloudinaryResponseDto upload(MultipartFile multipartFile) {
         validateFile(multipartFile);
         File file = null;
         try {
             file = convertToFile(multipartFile);
-            return cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+            Map result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+            
+            return CloudinaryResponseDto.builder()
+                    .url((String) result.get("url"))
+                    .publicId((String) result.get("public_id"))
+                    .build();
         } catch (InvalidFileException e) {
             throw e;
         } catch (Exception e) {
-            throw new FileUploadException("Error al subir archivo a Cloudinary");
+            throw new FileUploadException("Error al subir archivo a Cloudinary", e);
         } finally {
             if (file != null && file.exists()) {
                 file.delete();
@@ -75,13 +79,11 @@ public class CloudinaryServiceImpl implements CloudinaryService {
      * Elimina una imagen de Cloudinary usando su public_id
      *
      * @param publicId el ID público de la imagen en Cloudinary
-     * @return Map con el resultado de la operación
-     * @throws IOException si hay error en la eliminación
      */
     @Override
-    public Map<String, Object> delete(String publicId) throws IOException {
+    public void delete(String publicId) {
         try {
-            return cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
         } catch (Exception e) {
             throw new FileUploadException("Error al eliminar archivo de Cloudinary", e);
         }

@@ -24,6 +24,6 @@ public interface LeadMapper {
     List<LeadResponseDto> toDtoList(List<Lead> leads);
 
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "status",  expression = "java(Lead.LeadStatus.valueOf(dto.getStatus().toUpperCase()))")
+    @Mapping(target = "status",  expression = "java(Lead.LeadStatus.valueOf(request.getStatus().toUpperCase()))")
     void updateStatus(UpdateLeadStatusRequestDto request, @MappingTarget Lead lead);
 }

@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  LeadBoard_Backend:
+    image: springboot-leadboard:latest  # Usamos la imagen que construiste
+    build:
+      context: .  # Define el contexto como el directorio actual
+      dockerfile: Dockerfile  # Especificamos el Dockerfile a usar
+    ports:
+      - "8080:8080"  # Mapea el puerto del contenedor al puerto 8080 de tu máquina
+    restart: always

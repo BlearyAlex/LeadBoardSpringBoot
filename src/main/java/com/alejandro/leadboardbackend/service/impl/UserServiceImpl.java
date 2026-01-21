@@ -4,17 +4,14 @@ import com.alejandro.leadboardbackend.domain.dto.request.LoginRequestDto;
 import com.alejandro.leadboardbackend.domain.dto.request.RegisterRequestDto;
 import com.alejandro.leadboardbackend.domain.dto.response.LoginResponseDto;
 import com.alejandro.leadboardbackend.domain.entity.PasswordResetToken;
-import com.alejandro.leadboardbackend.exception.business.InvalidOperationException;
-import com.alejandro.leadboardbackend.exception.business.ResourceNotFoundException;
-import com.alejandro.leadboardbackend.exception.business.UserAlreadyExistsException;
 import com.alejandro.leadboardbackend.domain.entity.User;
+import com.alejandro.leadboardbackend.exception.business.*;
 import com.alejandro.leadboardbackend.repository.PasswordResetTokenRepository;
 import com.alejandro.leadboardbackend.repository.UserRepository;
 import com.alejandro.leadboardbackend.service.EmailService;
 import com.alejandro.leadboardbackend.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +43,21 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
-        // 1. Autenticar
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try {
+            // 1. Intentamos autenticar al usuario con el manager de autenticación
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (BadCredentialsException ex) {
+            // Lanzamos una excepción personalizada si las credenciales son incorrectas
+            throw new InvalidCredentialsException("Email o contraseña incorrectos");
+        } catch (LockedException ex) {
+            // Lanzamos una excepción personalizada si la cuenta está bloqueada
+            throw new AccountLockedException("La cuenta está bloqueada");
+        } catch (DisabledException ex) {
+            // Si la cuenta está deshabilitada
+            throw new AccountLockedException("La cuenta está deshabilitada");
+        }
 
         // 2. Buscar usuario
         User user = userRepository.findByEmail(request.getEmail())

@@ -1,10 +1,11 @@
-version: '3.8'
 services:
-  LeadBoard_Backend:
-    image: springboot-leadboard:latest  # Usamos la imagen que construiste
-    build:
-      context: .  # Define el contexto como el directorio actual
-      dockerfile: Dockerfile  # Especificamos el Dockerfile a usar
-    ports:
-      - "8080:8080"  # Mapea el puerto del contenedor al puerto 8080 de tu máquina
+  postgres:
+    image: postgres:15
+    container_name: my_postgres_db
     restart: always
+    environment:
+      POSTGRES_USER: myuser          # Nombre del usuario
+      POSTGRES_PASSWORD: mypassword  # Contraseña del usuario
+      POSTGRES_DB: LeadBoardDb        # Nombre de la base de datos inicial
+    ports:
+      - "5432:5432"                  # Exponer puerto para conexión local
